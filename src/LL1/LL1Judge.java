@@ -3,10 +3,7 @@ package LL1;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -15,13 +12,15 @@ import java.util.regex.Pattern;
 public class LL1Judge {
     private Map<Character, DeduceEpsilon> deduceEpsilons;
     private List<Character> Vns;
-    private Map<Character, java.util.List<String>> rules;
+    private Map<Character, List<String>> rules;
+    private Map<Character, Set<Character>> firstSet;
 
     public void judge(String filePath) throws IOException {
         GrammarReader reader = new GrammarReader();
         rules = reader.read(filePath);
-        System.out.println(rules);
+        System.out.println("rules: " + rules);
         constructDeduceEpsilon();
+        computeFirst();
     }
 
     private void constructDeduceEpsilon() {
@@ -121,14 +120,83 @@ public class LL1Judge {
                         changeFlag = true;
                     }
                     //以Vn为左部的产生式若为被全部删除，则更新其为新的产生式
-                    if(tempRules.get(Vn) != null)
+                    if (tempRules.get(Vn) != null)
                         tempRules.put(Vn, newRuleList);
                 }
             }
         }
 
 //        System.out.println(tempRules);
-        System.out.println(deduceEpsilons);
+        System.out.println("deduceEpsilons: " + deduceEpsilons);
+    }
+
+    private void computeFirst() {
+        //第二步
+        firstSet = new HashMap<>();
+        boolean changeFlag = true;
+        while (changeFlag) {
+            changeFlag = false;
+            for (Character Vn : Vns) {
+                for (String rule : rules.get(Vn)) {
+                    //遍历所有产生式
+                    if (rule.equals("ε")) {
+                        //2-3
+                        Set<Character> set = firstSet.getOrDefault(Vn, new HashSet<>());
+                        if (set.add('ε')) changeFlag = true;
+                        firstSet.putIfAbsent(Vn, set);
+                    } else {
+                        char begc = rule.charAt(0);
+                        if (!Character.isUpperCase(begc) && begc != 'ε') {
+                            //2-2
+                            //如果该产生式以终结符开始
+                            Set<Character> set = firstSet.getOrDefault(Vn, new HashSet<>());
+                            if (set.add(begc)) changeFlag = true;
+                            firstSet.putIfAbsent(Vn, set);
+                        } else if (Character.isUpperCase(begc)) {
+                            //2-4
+                            //以非终结符开始
+                            for (int i = 0; i < rule.length(); i++) {
+                                char v = rule.charAt(i);
+                                if (!Character.isUpperCase(v)) {
+                                    //遇到了终结符
+                                    Set<Character> set = firstSet.getOrDefault(Vn, new HashSet<>());
+                                    if (set.add(v)) changeFlag = true;
+                                    firstSet.putIfAbsent(Vn, set);
+                                    break;
+                                } else {
+                                    //Character.isUpperCase(v)
+                                    if (deduceEpsilons.get(v) == DeduceEpsilon.NO) {
+                                        //该非终结符无法推导出epsilon
+                                        Set<Character> set = firstSet.getOrDefault(Vn, new HashSet<>());
+                                        if (set.addAll(firstSet.getOrDefault(v, new HashSet<>()))) changeFlag = true;
+                                        firstSet.putIfAbsent(Vn, set);
+                                        break;
+                                    } else {
+                                        //deduceEpsilons.get(v) == DeduceEpsilon.YES
+                                        Set<Character> set = firstSet.getOrDefault(Vn, new HashSet<>());
+                                        Set<Character> added = new HashSet<>(firstSet.get(v));
+                                        added.remove('ε');
+                                        if (set.addAll(added)) changeFlag = true;
+                                        if (i == rule.length() - 1) {
+                                            if (set.add('ε')) changeFlag = true;
+                                        }
+                                        firstSet.putIfAbsent(Vn, set);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(firstSet);
+    }
+
+    private Set<Character> getFirstFromString(String s) {
+        //计算一个符号串的first集合
+        Set<Character> res = new HashSet<>();
+        return res;
     }
 
     @Test
