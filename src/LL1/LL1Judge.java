@@ -14,6 +14,7 @@ public class LL1Judge {
     private List<Character> Vns;
     private Map<Character, List<String>> rules;
     private Map<Character, Set<Character>> firstSet;
+    private Map<Character, Set<Character>> followSet;
 
     public void judge(String filePath) throws IOException {
         GrammarReader reader = new GrammarReader();
@@ -21,6 +22,9 @@ public class LL1Judge {
         System.out.println("rules: " + rules);
         constructDeduceEpsilon();
         computeFirst();
+        computeFollow();
+        System.out.println(getFirstFromString("ABC"));
+        System.out.println(getFirstFromString("AB"));
     }
 
     private void constructDeduceEpsilon() {
@@ -190,14 +194,76 @@ public class LL1Judge {
             }
         }
 
-        System.out.println(firstSet);
+        System.out.println("firstSet: " + firstSet);
     }
 
     private Set<Character> getFirstFromString(String s) {
         //计算一个符号串的first集合
         Set<Character> res = new HashSet<>();
+
+        if (s.equals("ε") || s.length() == 0) {
+            res.add('ε');
+            return res;
+        }
+
+        for (int i = 0; i < s.length(); i++) {
+            char curChar = s.charAt(i);
+            if (!Character.isUpperCase(curChar)) {
+                //curChar为终结符
+                res.add(curChar);
+                break;
+            } else {
+                //非终结符
+                if (deduceEpsilons.get(curChar) == DeduceEpsilon.NO) {
+                    res.addAll(firstSet.get(curChar));
+                    break;
+                } else {
+                    //deduceEpsilons.get(curChar) == DeduceEpsilon.YES
+                    HashSet<Character> added = new HashSet<>(firstSet.get(curChar));
+                    added.remove('ε');
+                    res.addAll(added);
+                    if (i == s.length() - 1) res.add('ε');
+                }
+            }
+        }
+
         return res;
     }
+
+    private void computeFollow() {
+        //第三步
+        followSet = new HashMap<>();
+        //3-1
+        HashSet<Character> initSet = new HashSet<>();
+        initSet.add('#');
+        followSet.put('S', initSet);
+
+        boolean changeFlag = true;
+        while (changeFlag) {
+            changeFlag = false;
+            for (Character Vn : Vns) {
+                for (String rule : rules.get(Vn)) {
+                    for (int i = 0; i < rule.length(); i++) {
+                        if (Character.isUpperCase(rule.charAt(i))) {
+                            //产生式中的非终结符
+                            Set<Character> set = followSet.getOrDefault(rule.charAt(i), new HashSet<>());
+                            Set<Character> added = getFirstFromString(rule.substring(i + 1));
+                            if (added.contains('ε')) {
+                                added.remove('ε');
+                                if (set.addAll(added)) changeFlag = true;
+                                if (set.addAll(followSet.getOrDefault(Vn, new HashSet<>()))) changeFlag = true;
+                            } else {
+                                if (set.addAll(added)) changeFlag = true;
+                            }
+                            followSet.putIfAbsent(rule.charAt(i), set);
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println(followSet);
+    }
+
 
     @Test
     public void test1() throws IOException {
