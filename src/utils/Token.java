@@ -45,10 +45,12 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" +
-                "sym=" + sym +
-                ", num=" + num +
-                ", id='" + id + '\'' +
-                '}';
+        String res = "Token{" +
+                "sym=" + sym;
+        if (sym == Symbol.Number) res = res + ", num=" + num;
+        if (sym == Symbol.Ident) res = res + ", id='" + id + '\'';
+        res += '}';
+
+        return res;
     }
 }

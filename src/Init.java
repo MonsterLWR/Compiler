@@ -1,5 +1,6 @@
 import Lex.Lexer;
 import org.junit.jupiter.api.Test;
+import syntax.SnytaxAnalysor;
 import utils.Token;
 
 /**
@@ -8,10 +9,17 @@ import utils.Token;
 public class Init {
     @Test
     public void testIdent() {
-        Lexer lexer = new Lexer("1+1=2\n:=.202*2.".toCharArray());
-        for (int i = 0; i < 11; i++) {
+        Lexer lexer = new Lexer("1+1=2\n:cost.".toCharArray());
+        while (lexer.hasNextToken()) {
             Token token = lexer.getNextToken();
             System.out.println(token);
         }
+    }
+
+    @Test
+    public void testSnytax() {
+        Lexer lexer = new Lexer(".".toCharArray());
+        SnytaxAnalysor snytaxAnalysor = new SnytaxAnalysor(lexer);
+        snytaxAnalysor.analyse();
     }
 }

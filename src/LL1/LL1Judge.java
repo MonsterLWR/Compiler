@@ -15,6 +15,7 @@ public class LL1Judge {
     private Map<Character, List<String>> rules;
     private Map<Character, Set<Character>> firstSet;
     private Map<Character, Set<Character>> followSet;
+    private Map<String, Set<Character>> selectSet;
 
     public void judge(String filePath) throws IOException {
         GrammarReader reader = new GrammarReader();
@@ -23,8 +24,9 @@ public class LL1Judge {
         constructDeduceEpsilon();
         computeFirst();
         computeFollow();
-        System.out.println(getFirstFromString("ABC"));
-        System.out.println(getFirstFromString("AB"));
+//        System.out.println(getFirstFromString("ABC"));
+//        System.out.println(getFirstFromString("AB"));
+        computeSelect();
     }
 
     private void constructDeduceEpsilon() {
@@ -262,6 +264,22 @@ public class LL1Judge {
             }
         }
         System.out.println(followSet);
+    }
+
+    private void computeSelect() {
+        selectSet = new HashMap<>();
+        for (Character Vn : Vns) {
+            for (String rule : rules.get(Vn)) {
+                Set<Character> set = getFirstFromString(rule);
+                if (set.contains('ε')) {
+                    set.remove('ε');
+                    set.addAll(followSet.get(Vn));
+                }
+                selectSet.put(Vn + "->" + rule, set);
+            }
+        }
+
+        System.out.println("select:" + selectSet);
     }
 
 

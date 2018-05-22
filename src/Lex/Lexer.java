@@ -52,7 +52,12 @@ public class Lexer {
         charMap.put(';', Symbol.Semicolon);
     }
 
+    public boolean hasNextToken() {
+        return index < codes.length;
+    }
+
     public Token getNextToken() {
+        if (!hasNextToken()) throw new RuntimeException("Token out of boundary!");
 //      index一直指向ch后的索引，注意回退
         char ch = codes[index++];
         while (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r') {
