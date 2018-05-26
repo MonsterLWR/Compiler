@@ -18,7 +18,8 @@ public class Init {
 
     @Test
     public void testSnytax() {
-        Lexer lexer = new Lexer("var haha,hehe;\nconst a = 5;.".toCharArray());
+        Lexer lexer = new Lexer(("while 2>3 \ndo " +
+                "begin if a>2 then a:=3 end.").toCharArray());
         SnytaxAnalysor snytaxAnalysor = new SnytaxAnalysor(lexer);
         snytaxAnalysor.analyse();
     }
