@@ -1,6 +1,7 @@
 package LL1;
 
 import org.junit.jupiter.api.Test;
+import utils.GrammarReader;
 
 import java.io.IOException;
 import java.util.*;
@@ -20,6 +21,7 @@ public class LL1Judge {
     public void judge(String filePath) throws IOException {
         GrammarReader reader = new GrammarReader();
         rules = reader.read(filePath);
+        Vns = new ArrayList<>(rules.keySet());
         System.out.println("rules: " + rules);
         constructDeduceEpsilon();
         computeFirst();
@@ -32,7 +34,6 @@ public class LL1Judge {
     private void constructDeduceEpsilon() {
         //该函数对应书中第一步
         Map<Character, java.util.List<String>> tempRules = new HashMap<>();
-        Vns = new ArrayList<>(rules.keySet());
 
         //书中第一步-(1)
         deduceEpsilons = new HashMap<>();
