@@ -12,6 +12,7 @@ import java.util.Map;
  */
 public class Lexer {
     private Symbol curSymbol;
+    private Token curToken;
     private int lineNum;
     private char[] codes;
     private int index;
@@ -20,11 +21,16 @@ public class Lexer {
 
     public void nextSymbol() {
         if (!hasNextToken()) Error.error("No more Token!", getLineNum());
-        curSymbol = getNextToken().getSym();
+        curToken = getNextToken();
+        curSymbol = curToken.getSym();
     }
 
     public Symbol getCurSymbol() {
         return curSymbol;
+    }
+
+    public Token getCurToken() {
+        return curToken;
     }
 
     public Lexer(char[] codes) {

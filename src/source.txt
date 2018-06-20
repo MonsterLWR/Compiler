@@ -1,0 +1,13 @@
+const haha = 1;
+procedure one;
+    const haha = 2;
+    var xixi;
+    procedure one;;
+    begin
+        call one;
+        read (xixi,xixi);
+        xixi := xixi * 2;
+    end;
+procedure two;
+    ;
+.

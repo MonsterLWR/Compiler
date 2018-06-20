@@ -1,7 +1,9 @@
 import Lex.Lexer;
+import compile.Compiler;
+import compile.SourceReader;
 import org.junit.jupiter.api.Test;
-import syntax.SnytaxAnalysor;
-import utils.Token;
+
+import java.io.IOException;
 
 /**
  * Created by 李炆睿 on 2018/4/14.
@@ -17,10 +19,13 @@ public class Init {
 //    }
 
     @Test
-    public void testSnytax() {
-        Lexer lexer = new Lexer(("while 2>3 \ndo " +
-                "begin if a>2 then a:=3 end.").toCharArray());
-        SnytaxAnalysor snytaxAnalysor = new SnytaxAnalysor(lexer);
-        snytaxAnalysor.analyse();
+    public void testSnytax() throws IOException {
+        SourceReader reader = new SourceReader();
+        char[] source = reader.read("src/source.txt").toCharArray();
+        System.out.println(source);
+
+        Lexer lexer = new Lexer(source);
+        Compiler compiler = new Compiler(lexer);
+        compiler.analyse();
     }
 }
