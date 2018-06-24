@@ -25,7 +25,7 @@ public class Init {
         System.out.println(source);
 
         Lexer lexer = new Lexer(source);
-        Compiler compiler = new Compiler(lexer);
+        Compiler compiler = new Compiler(lexer, "src/target.c");
         compiler.analyse();
     }
 }

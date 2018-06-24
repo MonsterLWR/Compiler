@@ -9,6 +9,10 @@ import java.util.List;
 public class NameTable {
     private List<Table> tables;
 
+    public int tableSize() {
+        return tables.size();
+    }
+
     public NameTable() {
         tables = new ArrayList<>();
     }

@@ -2,12 +2,19 @@ const haha = 1;
 procedure one;
     const haha = 2;
     var xixi;
-    procedure one;;
     begin
         call one;
-        read (xixi,xixi);
-        xixi := xixi * 2;
+        read (xixi);
+        while xixi > 2
+        do
+        begin
+        xixi := xixi * (2+5);
+        xixi := xixi * (2+5);
+        end
     end;
 procedure two;
-    ;
+    begin
+    call one;
+    write (2+2);
+    end;
 .
